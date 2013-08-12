@@ -1,7 +1,9 @@
-function Game(framesPerSecond) {
+function Game(framesPerSecond, canvas) {
   var fps = framesPerSecond;
   var intervalId;
   var isRunning = false;
+  var canvas = canvas;
+  var ctx = canvas.getContext("2d");
 
   this.start = function () {
     isRunning = true;
@@ -24,10 +26,17 @@ function Game(framesPerSecond) {
 
   var update = function () {
     console.log("updating");
+
+
+    tmpObject = { x: Math.random() * canvas.width, y: Math.random() * canvas.height };
   }
 
   var draw = function () {
     console.log("drawing");
+
+    canvas.width = canvas.width;
+    ctx.fillRect(tmpObject.x, tmpObject.y, 10, 10)
   }
 
+  var tmpObject;
 }
