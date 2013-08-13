@@ -26,18 +26,9 @@ function Game(framesPerSecond, canvas) {
 
   var update = function () {
     console.log("updating");
-
-
-    tmpObject = { x: Math.random() * canvas.width - tmpSize, y: Math.random() * canvas.height - tmpSize };
   }
 
   var draw = function () {
     console.log("drawing");
-
-    canvas.width = canvas.width;
-    ctx.fillRect(tmpObject.x, tmpObject.y, tmpSize, tmpSize)
   }
-
-  var tmpObject;
-  var tmpSize = 10;
 }
