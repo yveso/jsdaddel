@@ -1,4 +1,8 @@
-var game = new Game(1, document.getElementById("mainCanvas"));
+var canvas = document.getElementById("mainCanvas");
+var world = new World(canvas.width, canvas.height)
+var keyboardState = {};
+
+var game = new Game(60, canvas, world, keyboardState);
 
 var btn = document.getElementById("btnToggleGameState");
 
@@ -10,4 +14,15 @@ btn.onclick = function () {
     game.start();
     btn.innerHTML = "Stop Game";
   }
+}
+/*
+window.onkeydown = function (e) {
+  e = e || window.event;
+  keyboardState[e.keyCode] = true;
+}
+*/
+window.onkeyup = function (e) {
+  e = e || window.event;
+  //delete keyboardState[e.keyCode];
+  keyboardState[e.keyCode] = true;
 }

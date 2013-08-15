@@ -1,9 +1,11 @@
-function Game(framesPerSecond, canvas) {
+function Game(framesPerSecond, canvas, world, keyboardState) {
   var fps = framesPerSecond;
   var intervalId;
   var isRunning = false;
   var canvas = canvas;
   var ctx = canvas.getContext("2d");
+  this.world = world;
+  this.keyboardState = keyboardState;
 
   this.start = function () {
     isRunning = true;
@@ -25,10 +27,13 @@ function Game(framesPerSecond, canvas) {
   }
 
   var update = function () {
-    console.log("updating");
+    //console.log("updating");
+    world.update(this.keyboardState);
   }
 
   var draw = function () {
-    console.log("drawing");
+    //console.log("drawing");
+    canvas.width = canvas.width;
+    this.world.draw(ctx);
   }
 }
