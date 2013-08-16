@@ -8,27 +8,29 @@ function World(viewportWidth, viewportHeight) {
   var cellHeight = 32;
 
   this.update = function (kbState) {
-    if (kbState[32]) {
-      alert("yay");
-    }
+      //console.log("yay");
+      this.cam.x+= 10;
+      this.cam.y+= 10;
+
   }
 
   this.draw = function (context) {
     var firstX = Math.floor(this.cam.x / cellWidth);
     var firstY = Math.floor(this.cam.y / cellHeight);
+    console.log(firstX, firstY)
     var countAcross = Math.min(Math.floor(this.cam.width / cellWidth) + 1, this.map.rows[0].cols.length - firstX);
     var countDown = Math.min(Math.floor(2 * this.cam.height / cellHeight) + 1, this.map.rows.length - firstY);
 
     var verOffset = 16;
-    for (var i = firstX; i < countDown; i++) {
+    for (var i = firstY; i < firstY + countDown; i++) {
       var row = this.map.rows[i];
       var horOffset = i % 2 === 0 ? 0 : 32;
-      for (var j = firstX; j < countAcross; j++) {
+      for (var j = firstX; j < firstX + countAcross; j++) {
         var cell = row.cols[j];
         context.drawImage(this.tilemap,
           cell.baseTextureX, cell.baseTextureY,
           cellWidth, cellHeight,
-          j * cellWidth + horOffset, i * (cellHeight - verOffset),
+          (j - firstX) * cellWidth + horOffset, (i - firstY) * (cellHeight - verOffset),
           cellWidth, cellHeight);
       }
     }
