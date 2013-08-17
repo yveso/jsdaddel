@@ -1,8 +1,7 @@
 var canvas = document.getElementById("mainCanvas");
 var world = new World(canvas.width, canvas.height)
-var keyboardState = {};
 
-var game = new Game(1, canvas, world, keyboardState);
+var game = new Game(30, canvas, world);
 
 var btn = document.getElementById("btnToggleGameState");
 
@@ -14,15 +13,4 @@ btn.onclick = function () {
     game.start();
     btn.innerHTML = "Stop Game";
   }
-}
-
-window.onkeydown = function (e) {
-  e = e || window.event;
-  keyboardState[e.keyCode] = true;
-}
-
-window.onkeyup = function (e) {
-  e = e || window.event;
-  delete keyboardState[e.keyCode];
-  //keyboardState[e.keyCode] = true;
 }

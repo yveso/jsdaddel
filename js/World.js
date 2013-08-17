@@ -7,17 +7,15 @@ function World(viewportWidth, viewportHeight) {
   var cellWidth = 64;
   var cellHeight = 32;
 
-  this.update = function (kbState) {
+  this.update = function () {
       //console.log("yay");
-      this.cam.x+= 10;
-      this.cam.y+= 10;
-
+      //this.cam.x+= 10;
+      //this.cam.y+= 10;
   }
 
   this.draw = function (context) {
     var firstX = Math.floor(this.cam.x / cellWidth);
     var firstY = Math.floor(this.cam.y / cellHeight);
-    console.log(firstX, firstY)
     var countAcross = Math.min(Math.floor(this.cam.width / cellWidth) + 1, this.map.rows[0].cols.length - firstX);
     var countDown = Math.min(Math.floor(2 * this.cam.height / cellHeight) + 1, this.map.rows.length - firstY);
 
