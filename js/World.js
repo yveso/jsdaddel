@@ -7,31 +7,49 @@ function World(viewportWidth, viewportHeight) {
   var cellWidth = 64;
   var cellHeight = 32;
 
-  this.update = function () {
-      //console.log("yay");
-      //this.cam.x+= 10;
-      //this.cam.y+= 10;
+  var mouseCell = { x: 0, y: 0 }
+
+  this.update = function (mouseX, mouseY, pressedKeys) {
+      if (pressedKeys[37]) {//left
+        if (this.cam.x > 0)this.cam.x--;
+      }
+      if (pressedKeys[38]) {//up
+        if (this.cam.y > 0) this.cam.y--;
+      }
+      if (pressedKeys[39]) {//right
+        if (this.cam.x < this.map.rows[1].cols.length * cellWidth) this.cam.x++;
+      }
+      if (pressedKeys[40]) {//down
+        this.cam.y++;
+      }
   }
 
   this.draw = function (context) {
-    var firstX = Math.floor(this.cam.x / cellWidth);
-    var firstY = Math.floor(this.cam.y / cellHeight);
-    var countAcross = Math.min(Math.floor(this.cam.width / cellWidth) + 1, this.map.rows[0].cols.length - firstX);
-    var countDown = Math.min(Math.floor(2 * this.cam.height / cellHeight) + 1, this.map.rows.length - firstY);
-
     var verOffset = 16;
-    for (var i = firstY; i < firstY + countDown; i++) {
-      var row = this.map.rows[i];
-      var horOffset = i % 2 === 0 ? 0 : 32;
-      for (var j = firstX; j < firstX + countAcross; j++) {
-        var cell = row.cols[j];
-        context.drawImage(this.tilemap,
-          cell.baseTextureX, cell.baseTextureY,
-          cellWidth, cellHeight,
-          (j - firstX) * cellWidth + horOffset, (i - firstY) * (cellHeight - verOffset),
-          cellWidth, cellHeight);
+
+    for (var r = 0; r < this.map.rows.length; r++) {
+      var row = this.map.rows[r];
+      var horOffset = r % 2 === 0 ? 0 : 32;
+      for (var c = 0; c < row.cols.length; c++) {
+        var cell = row.cols[c];
+
+
+        var drawX = (c * cellWidth + horOffset) - this.cam.x;
+        var drawY = (r * (cellHeight - verOffset)) - this.cam.y;
+
+        if (drawX > -cellWidth && drawX < context.canvas.width
+            && drawY > -cellHeight && drawY < context.canvas.height) {
+          context.drawImage(this.tilemap,
+            cell.baseTextureX, cell.baseTextureY,
+            cellWidth, cellHeight,
+            drawX, drawY,
+            cellWidth, cellHeight
+          );
+        }
       }
     }
+    context.fillStyle = "rgba(255, 255, 255, 0.5)";
+    context.fillRect(mouseCell.x, mouseCell.y, cellWidth, cellHeight)
   }
 }
 
