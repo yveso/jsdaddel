@@ -10,16 +10,19 @@
       <h1>jsdaddel</h1>
     </header>
     <div id="main">
-      <button id="btnToggleGameState">Start Game</button>
       <canvas id="mainCanvas" width="800" height="600">
         <p>Your browser makes me sad...</p>
       </canvas>
     </div>
-    <p>
-      <strong>Mouse</strong><br>
-      x is <span id="mouseX"></span>, y is <span id="mouseY"></span><br>
-      Use cursor keys to scroll
-    </p>
+    <div style="float: left;">
+      <button id="btnToggleGameState">Start Game</button>
+    </div>    
+    <div style="display: inline-block;">
+      <ul>
+        <li><strong>Mouse: </strong>x is <span id="mouseXspan"></span>, y is <span id="mouseYspan"></span></li>
+        <li>Use cursor keys to scroll</li>
+      </ul>
+    </div>
 
     <script type="text/javascript" src="js/World.js"></script>
     <script type="text/javascript" src="js/Game.js"></script>

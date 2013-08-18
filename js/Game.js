@@ -19,8 +19,8 @@ function Game(framesPerSecond, canvas, world) {
         mouseY = e.layerY;
     }
 
-    document.getElementById("mouseX").innerHTML = mouseX;
-    document.getElementById("mouseY").innerHTML = mouseY;
+    document.getElementById("mouseXspan").innerHTML = mouseX;
+    document.getElementById("mouseYspan").innerHTML = mouseY;
   }
 
   window.onkeydown = function (e) {
