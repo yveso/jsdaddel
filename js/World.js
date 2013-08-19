@@ -13,18 +13,21 @@ function World(viewportWidth, viewportHeight) {
   var mouseCell = {};//{ x: 0, y: 0 }
 
   this.update = function (mouseX, mouseY, pressedKeys) {
+    var scrollFactor = 4;
     if (pressedKeys[37]) {//left
-      if (this.cam.x > 0) this.cam.x--;
+      if (this.cam.x > 0) this.cam.x -= scrollFactor;
     }
     if (pressedKeys[38]) {//up
-      if (this.cam.y > 0) this.cam.y--;
+      if (this.cam.y > 0) this.cam.y -= scrollFactor;
     }
     //TODO: Overflows
     if (pressedKeys[39]) {//right
-      if (this.cam.x < this.map.rows[1].cols.length * cellWidth) this.cam.x++;
+      if (this.cam.x + viewportWidth < (this.map.rows[1].cols.length + 0.5) * cellWidth)
+        this.cam.x += scrollFactor;
     }
     if (pressedKeys[40]) {//down
-      this.cam.y++;
+      if (this.cam.y + viewportHeight < this.map.rows.length * (cellHeight / 2) + (cellHeight / 2))
+        this.cam.y += scrollFactor;
     }
 
     //Rewrite this...
