@@ -10,7 +10,7 @@ function World(viewportWidth, viewportHeight) {
   var cellWidth = 64;
   var cellHeight = 32;
 
-  var mouseCell = {};//{ x: 0, y: 0 }
+  var mouseCell = {};
 
   this.update = function (mouseX, mouseY, pressedKeys) {
     var scrollFactor = 4;
@@ -20,7 +20,6 @@ function World(viewportWidth, viewportHeight) {
     if (pressedKeys[38]) {//up
       if (this.cam.y > 0) this.cam.y -= scrollFactor;
     }
-    //TODO: Overflows
     if (pressedKeys[39]) {//right
       if (this.cam.x + viewportWidth < (this.map.rows[1].cols.length + 0.5) * cellWidth)
         this.cam.x += scrollFactor;
