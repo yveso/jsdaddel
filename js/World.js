@@ -64,8 +64,6 @@ function World(viewportWidth, viewportHeight) {
           break;
         }
       }
-      //Bug if one is undefined...
-      //var goodCell = this.nearerCell(goodCellEven, goodCellOdd, mouseX, mouseY);
       var goodCell;
       if (goodCellEven && !goodCellOdd) {
         goodCell = goodCellEven;
