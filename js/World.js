@@ -5,6 +5,7 @@ function World(viewportWidth, viewportHeight) {
   this.map = sampleMap();
 
   var drawnMap = {};
+  var drawnMap2 = [];
 
   var cellWidth = 64;
   var cellHeight = 32;
@@ -27,35 +28,27 @@ function World(viewportWidth, viewportHeight) {
       if (this.cam.y + viewportHeight < this.map.rows.length * (cellHeight / 2) + (cellHeight / 2))
         this.cam.y += scrollFactor;
     }
-    
+
     if (drawnMap.evenRows && mouseX && mouseY) {
       var cursorCell = getCellFromScreenPoint(mouseX, mouseY);
       if (cursorCell) { mouseCell = { x: cursorCell.x, y: cursorCell.y }; }
     }
-  }
 
-  this.draw = function (context) {
-    drawnMap = {};
     drawnMap.evenRows = [];
     drawnMap.oddRows = [];
-
-    var verOffset = 16;
+    var verOffset = cellHeight / 2;
 
     for (var r = 0; r < this.map.rows.length; r++) {
       var row = this.map.rows[r];
-      var horOffset = r % 2 === 0 ? 0 : 32;
+      var horOffset = r % 2 === 0 ? 0 : (cellWidth / 2);
       for (var c = 0; c < row.cols.length; c++) {
         var cell = row.cols[c];
-
 
         var drawX = (c * cellWidth + horOffset) - this.cam.x;
         var drawY = (r * (cellHeight - verOffset)) - this.cam.y;
 
-        if (drawX > -cellWidth && drawX < context.canvas.width
-            && drawY > -cellHeight && drawY < context.canvas.height) {
-
-          cell.drawBase(this.tilemap, context, drawX, drawY);
-
+        if (drawX > -cellWidth && drawX < viewportWidth
+            && drawY > -cellHeight && drawY < viewportHeight) {
           if (r % 2 == 0) {
             drawnMap.evenRows[r] = drawnMap.evenRows[r] || [];
             drawnMap.evenRows[r][c] = { x: drawX, y: drawY };
@@ -63,19 +56,30 @@ function World(viewportWidth, viewportHeight) {
             drawnMap.oddRows[r] = drawnMap.oddRows[r] || [];
             drawnMap.oddRows[r][c] = { x: drawX, y: drawY };
           }
+          drawnMap2[r] = drawnMap2[r] || [];
+          drawnMap2[r][c] = { x: drawX, y: drawY };
         }
       }
     }
-    if (mouseCell) {
-      context.fillStyle = "rgba(255, 255, 255, 0.2)";
-      context.beginPath();
-      context.moveTo(mouseCell.x, mouseCell.y + cellHeight / 2);
-      context.lineTo(mouseCell.x + cellWidth / 2, mouseCell.y);
-      context.lineTo(mouseCell.x + cellWidth, mouseCell.y + cellHeight / 2);
-      context.lineTo(mouseCell.x + cellWidth / 2, mouseCell.y + cellHeight);
-      context.closePath();
-      context.fill();
-      context.stroke();
+  }
+
+  this.draw = function (context) {
+    for (var r in drawnMap2) {
+      for (var c in drawnMap2[r]) {
+        var coordinates = drawnMap2[r][c];
+        var cell = this.map.rows[r].cols[c];
+        cell.drawBase(this.tilemap, context, coordinates.x, coordinates.y);
+      }
+    }
+
+    drawMouseCell(context);
+    
+    for (var r in drawnMap2) {
+      for (var c in drawnMap2[r]) {
+        var coordinates = drawnMap2[r][c];
+        var cell = this.map.rows[r].cols[c];
+        cell.drawTopping(this.tilemap, context, coordinates.x, coordinates.y);
+      }
     }
   }
 
@@ -89,7 +93,7 @@ function World(viewportWidth, viewportHeight) {
   }
 
   var getMiddleOfCell = function (cell) {
-    return { x: cell.x + (cellWidth * 0.5), y: cell.y + (cellHeight / 2) };
+    return { x: cell.x + (cellWidth * 0.5), y: cell.y + (cellHeight * 0.5) };
   }
 
   var getCellFromScreenPoint = function (screenX, screenY) {
@@ -126,8 +130,21 @@ function World(viewportWidth, viewportHeight) {
         break;
       }
     }
-
     return candidateCell;
+  }
+
+  var drawMouseCell = function (context) {
+    if (mouseCell) {
+      context.fillStyle = "rgba(255, 255, 255, 0.2)";
+      context.beginPath();
+      context.moveTo(mouseCell.x, mouseCell.y + cellHeight / 2);
+      context.lineTo(mouseCell.x + cellWidth / 2, mouseCell.y);
+      context.lineTo(mouseCell.x + cellWidth, mouseCell.y + cellHeight / 2);
+      context.lineTo(mouseCell.x + cellWidth / 2, mouseCell.y + cellHeight);
+      context.closePath();
+      context.fill();
+      context.stroke();
+    }
   }
 }
 
@@ -138,20 +155,35 @@ function Camera(width, height) {
   this.height = height;
 }
 
-function Cell(baseTexturePoint) {
-  this.baseTextureX = baseTexturePoint.x;
-  this.baseTextureY = baseTexturePoint.y;
-  this.width = 64; //...
+function Cell(baseTextureOrigin) {
+  this.baseTextureOrigin = baseTextureOrigin;
+  this.width = 64; 
   this.height = 32;
+  this.toppingTexture;
+
+  this.addTopping = function (toppingData) {
+    this.toppingTexture = toppingData;
+  }
 
   this.drawBase = function (tilemap, context, x, y) {
     context.drawImage(
       tilemap,
-      this.baseTextureX, this.baseTextureY,
+      this.baseTextureOrigin.x, this.baseTextureOrigin.y,
       this.width, this.height,
       x, y,
       this.width, this.height);
   }
+
+  this.drawTopping = function (tilemap, context, x, y) {
+    if (this.toppingTexture) {
+      context.drawImage(
+        tilemap,
+        this.toppingTexture.x, this.toppingTexture.y,
+        this.toppingTexture.width, this.toppingTexture.height,
+        x - (this.toppingTexture.width - this.width), y - (this.toppingTexture.height - this.height),
+        this.toppingTexture.width, this.toppingTexture.height);
+    }
+  } 
 }
 
 var baseTileCutter = function (row, col) {
@@ -164,6 +196,14 @@ var baseTileCutter = function (row, col) {
 
 var seaTile = function () {
   return { x: 256, y: 544 };
+}
+
+var grassTopping = function () {
+  return { x: 0, y: 720, width: 64, height: 32 };
+}
+
+var treeTopping = function () {
+  return { x: 128, y: 786, width: 64, height: 108 };
 }
 
 var sampleMap = function () {
@@ -187,6 +227,9 @@ var sampleMap = function () {
       }
     }
   }
+  map.rows[3].cols[3].addTopping(grassTopping());
+
+  map.rows[20].cols[1].addTopping(treeTopping());
 
   return map;
 }
