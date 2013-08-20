@@ -98,12 +98,9 @@ function World(viewportWidth, viewportHeight) {
 
         if (drawX > -cellWidth && drawX < context.canvas.width
             && drawY > -cellHeight && drawY < context.canvas.height) {
-          context.drawImage(this.tilemap,
-            cell.baseTextureX, cell.baseTextureY,
-            cellWidth, cellHeight,
-            drawX, drawY,
-            cellWidth, cellHeight
-          );
+          
+          cell.drawBase(this.tilemap, context, drawX, drawY);
+          
           if (r % 2 == 0) {
             drawnMapEvenRows[r] = drawnMapEvenRows[r] || [];
             drawnMapEvenRows[r][c] = { x: drawX, y: drawY };
@@ -153,6 +150,15 @@ function Cell(baseTexturePoint) {
   this.baseTextureY = baseTexturePoint.y;
   this.width = 64; //...
   this.height = 32;
+
+  this.drawBase = function (tilemap, context, x, y) {
+    context.drawImage(
+      tilemap,
+      this.baseTextureX, this.baseTextureY,
+      this.width, this.height,
+      x, y,
+      this.width, this.height);
+  }
 }
 
 var baseTileCutter = function (row, col) {
