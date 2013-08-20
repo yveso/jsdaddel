@@ -1,5 +1,5 @@
 var canvas = document.getElementById("mainCanvas");
-var world = new World(canvas.width, canvas.height)
+var world = new World(canvas.width, canvas.height);
 
 var game = new Game(30, canvas, world);
 

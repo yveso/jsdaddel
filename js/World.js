@@ -4,8 +4,7 @@ function World(viewportWidth, viewportHeight) {
   this.cam = new Camera(viewportWidth, viewportHeight)
   this.map = sampleMap();
 
-  var drawnMapEvenRows = [];
-  var drawnMapOddRows = [];
+  var drawnMap = {};
 
   var cellWidth = 64;
   var cellHeight = 32;
@@ -28,61 +27,17 @@ function World(viewportWidth, viewportHeight) {
       if (this.cam.y + viewportHeight < this.map.rows.length * (cellHeight / 2) + (cellHeight / 2))
         this.cam.y += scrollFactor;
     }
-
-    //Rewrite this...
-    if (mouseX && mouseY) {
-      var goodRowEven = 0, goodCellEven;
-      for (var i in drawnMapEvenRows) {
-        var firstCol = drawnMapEvenRows[i][drawnMapEvenRows[i].length - 1]; //l-1 should always be defined
-        if (firstCol.y <= mouseY) {
-          goodRowEven = i;
-        } else {
-          break;
-        }
-      }
-      for (var i in drawnMapEvenRows[goodRowEven]) {
-        var cell = drawnMapEvenRows[goodRowEven][i];
-        if (cell.x < mouseX) {
-          goodCellEven = cell;
-        } else {
-          break;
-        }
-      }
-
-      var goodRowOdd = 0, goodCellOdd;
-      for (var i in drawnMapOddRows) {
-        var firstCol = drawnMapOddRows[i][drawnMapOddRows[i].length - 1];
-        if (firstCol.y <= mouseY) {
-          goodRowOdd = i;
-        } else {
-          break;
-        }
-      }
-      for (var i in drawnMapOddRows[goodRowOdd]) {
-        var cell = drawnMapOddRows[goodRowOdd][i];
-        if (cell.x < mouseX) {
-          goodCellOdd = cell;
-        } else {
-          break;
-        }
-      }
-      var goodCell;
-      if (goodCellEven && !goodCellOdd) {
-        goodCell = goodCellEven;
-      } else if (!goodCellEven && goodCellOdd) {
-        goodCell = goodCellOdd;
-      } else if (goodCellEven && goodCellOdd) {
-        goodCell = this.nearerCell(goodCellEven, goodCellOdd, mouseX, mouseY);
-      }
-
-
-      if (goodCell) { mouseCell = { x: goodCell.x, y: goodCell.y }; }
+    
+    if (drawnMap.evenRows && mouseX && mouseY) {
+      var cursorCell = getCellFromScreenPoint(mouseX, mouseY);
+      if (cursorCell) { mouseCell = { x: cursorCell.x, y: cursorCell.y }; }
     }
   }
 
   this.draw = function (context) {
-    drawnMapEvenRows = [];
-    drawnMapOddRows = [];
+    drawnMap = {};
+    drawnMap.evenRows = [];
+    drawnMap.oddRows = [];
 
     var verOffset = 16;
 
@@ -98,15 +53,15 @@ function World(viewportWidth, viewportHeight) {
 
         if (drawX > -cellWidth && drawX < context.canvas.width
             && drawY > -cellHeight && drawY < context.canvas.height) {
-          
+
           cell.drawBase(this.tilemap, context, drawX, drawY);
-          
+
           if (r % 2 == 0) {
-            drawnMapEvenRows[r] = drawnMapEvenRows[r] || [];
-            drawnMapEvenRows[r][c] = { x: drawX, y: drawY };
+            drawnMap.evenRows[r] = drawnMap.evenRows[r] || [];
+            drawnMap.evenRows[r][c] = { x: drawX, y: drawY };
           } else {
-            drawnMapOddRows[r] = drawnMapOddRows[r] || [];
-            drawnMapOddRows[r][c] = { x: drawX, y: drawY };
+            drawnMap.oddRows[r] = drawnMap.oddRows[r] || [];
+            drawnMap.oddRows[r][c] = { x: drawX, y: drawY };
           }
         }
       }
@@ -124,7 +79,7 @@ function World(viewportWidth, viewportHeight) {
     }
   }
 
-  this.nearerCell = function (cellOne, cellTwo, x, y) {
+  var nearerCell = function (cellOne, cellTwo, x, y) {
     var midOne = getMiddleOfCell(cellOne);
     var midTwo = getMiddleOfCell(cellTwo);
     var distOne = Math.sqrt(Math.pow(x - midOne.x, 2) + Math.pow(y - midOne.y, 2));
@@ -135,6 +90,44 @@ function World(viewportWidth, viewportHeight) {
 
   var getMiddleOfCell = function (cell) {
     return { x: cell.x + (cellWidth * 0.5), y: cell.y + (cellHeight / 2) };
+  }
+
+  var getCellFromScreenPoint = function (screenX, screenY) {
+    var candidateEven = getCellFromOne(drawnMap.evenRows, screenX, screenY);
+    var candidateOdd = getCellFromOne(drawnMap.oddRows, screenX, screenY);
+
+    if (candidateEven && !candidateOdd) {
+      return candidateEven;
+    } else if (!candidateEven && candidateOdd) {
+      return candidateOdd;
+    } else if (candidateEven && candidateOdd) {
+      var cell = nearerCell(candidateEven, candidateOdd, screenX, screenY);
+      return cell;
+    }
+  }
+
+  var getCellFromOne = function (one, screenX, screenY) {
+    var candidateRow = 0;
+    var candidateCell;
+
+    for (var r in one) {
+      var horValue = one[r][one[r].length - 1].y;
+      if (horValue < screenY) {
+        candidateRow = r;
+      } else {
+        for (var c in one[candidateRow]) {
+          var currentCell = one[candidateRow][c];
+          if (currentCell.x < screenX) {
+            candidateCell = currentCell;
+          } else {
+            break;
+          }
+        }
+        break;
+      }
+    }
+
+    return candidateCell;
   }
 }
 
