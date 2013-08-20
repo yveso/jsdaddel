@@ -199,7 +199,7 @@ var seaTile = function () {
 }
 
 var grassTopping = function () {
-  return { x: 0, y: 720, width: 64, height: 32 };
+  return { x: 0, y: 720, width: 64, height: 40 };
 }
 
 var treeTopping = function () {
