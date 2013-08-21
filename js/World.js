@@ -36,6 +36,7 @@ function World(viewportWidth, viewportHeight) {
 
     drawnMap.evenRows = [];
     drawnMap.oddRows = [];
+    drawnMap2 = [];
     var verOffset = cellHeight / 2;
 
     for (var r = 0; r < this.map.rows.length; r++) {
@@ -60,6 +61,11 @@ function World(viewportWidth, viewportHeight) {
           drawnMap2[r][c] = { x: drawX, y: drawY };
         }
       }
+    }
+
+    if (mouseX && mouseY) {
+      var cursorCell = getCellFromScreenPoint(mouseX, mouseY);
+      if (cursorCell) { mouseCell = { x: cursorCell.x, y: cursorCell.y }; }
     }
   }
 
