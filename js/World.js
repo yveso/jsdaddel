@@ -4,39 +4,35 @@ function World(viewportWidth, viewportHeight) {
   this.cam = new Camera(viewportWidth, viewportHeight)
   this.map = sampleMap();
 
-  var drawnMap = {};
-  var drawnMap2 = [];
+  var drawnMap = [];
 
   var cellWidth = 64;
   var cellHeight = 32;
 
   var mouseCell = {};
+  var lastMouseX, lastMouseY;
 
   this.update = function (mouseX, mouseY, pressedKeys) {
     var scrollFactor = 4;
-    if (pressedKeys[37]) {//left
-      if (this.cam.x > 0) this.cam.x -= scrollFactor;
+    var scrollingActive = false;
+    if (pressedKeys[37] && this.cam.x > 0) {//left
+      this.cam.x -= scrollFactor;
+      scrollingActive = true;
     }
-    if (pressedKeys[38]) {//up
-      if (this.cam.y > 0) this.cam.y -= scrollFactor;
+    if (pressedKeys[38] && this.cam.y > 0) {//up
+      this.cam.y -= scrollFactor;
+      scrollingActive = true;
     }
-    if (pressedKeys[39]) {//right
-      if (this.cam.x + viewportWidth < (this.map.rows[1].cols.length + 0.5) * cellWidth)
-        this.cam.x += scrollFactor;
+    if (pressedKeys[39] && this.cam.x + viewportWidth < (this.map.rows[1].cols.length + 0.5) * cellWidth) {//right
+      this.cam.x += scrollFactor;
+      scrollingActive = true;
     }
-    if (pressedKeys[40]) {//down
-      if (this.cam.y + viewportHeight < this.map.rows.length * (cellHeight / 2) + (cellHeight / 2))
-        this.cam.y += scrollFactor;
-    }
-
-    if (drawnMap.evenRows && mouseX && mouseY) {
-      var cursorCell = getCellFromScreenPoint(mouseX, mouseY);
-      if (cursorCell) { mouseCell = { x: cursorCell.x, y: cursorCell.y }; }
+    if (pressedKeys[40] && this.cam.y + viewportHeight < this.map.rows.length * (cellHeight / 2) + (cellHeight / 2)) {//down
+      this.cam.y += scrollFactor;
+      scrollingActive = true;
     }
 
-    drawnMap.evenRows = [];
-    drawnMap.oddRows = [];
-    drawnMap2 = [];
+    drawnMap = [];
     var verOffset = cellHeight / 2;
 
     for (var r = 0; r < this.map.rows.length; r++) {
@@ -50,29 +46,24 @@ function World(viewportWidth, viewportHeight) {
 
         if (drawX > -cellWidth && drawX < viewportWidth
             && drawY > -cellHeight && drawY < viewportHeight) {
-          if (r % 2 == 0) {
-            drawnMap.evenRows[r] = drawnMap.evenRows[r] || [];
-            drawnMap.evenRows[r][c] = { x: drawX, y: drawY };
-          } else {
-            drawnMap.oddRows[r] = drawnMap.oddRows[r] || [];
-            drawnMap.oddRows[r][c] = { x: drawX, y: drawY };
-          }
-          drawnMap2[r] = drawnMap2[r] || [];
-          drawnMap2[r][c] = { x: drawX, y: drawY };
+          drawnMap[r] = drawnMap[r] || [];
+          drawnMap[r][c] = { x: drawX, y: drawY };
         }
       }
     }
 
-    if (mouseX && mouseY) {
+    if (mouseX != lastMouseX || mouseY != lastMouseY || scrollingActive) {
       var cursorCell = getCellFromScreenPoint(mouseX, mouseY);
       if (cursorCell) { mouseCell = { x: cursorCell.x, y: cursorCell.y }; }
     }
+    lastMouseX = mouseX;
+    lastMouseY = mouseY;
   }
 
   this.draw = function (context) {
-    for (var r in drawnMap2) {
-      for (var c in drawnMap2[r]) {
-        var coordinates = drawnMap2[r][c];
+    for (var r in drawnMap) {
+      for (var c in drawnMap[r]) {
+        var coordinates = drawnMap[r][c];
         var cell = this.map.rows[r].cols[c];
         cell.drawBase(this.tilemap, context, coordinates.x, coordinates.y);
       }
@@ -80,9 +71,9 @@ function World(viewportWidth, viewportHeight) {
 
     drawMouseCell(context);
     
-    for (var r in drawnMap2) {
-      for (var c in drawnMap2[r]) {
-        var coordinates = drawnMap2[r][c];
+    for (var r in drawnMap) {
+      for (var c in drawnMap[r]) {
+        var coordinates = drawnMap[r][c];
         var cell = this.map.rows[r].cols[c];
         cell.drawTopping(this.tilemap, context, coordinates.x, coordinates.y);
       }
@@ -103,8 +94,13 @@ function World(viewportWidth, viewportHeight) {
   }
 
   var getCellFromScreenPoint = function (screenX, screenY) {
-    var candidateEven = getCellFromOne(drawnMap.evenRows, screenX, screenY);
-    var candidateOdd = getCellFromOne(drawnMap.oddRows, screenX, screenY);
+    var evenRows = [], oddRows = [];
+    for (var i in drawnMap) {
+      (i % 2 === 0 ? evenRows : oddRows).push(drawnMap[i]);
+    }
+
+    var candidateEven = getCellFromOne(evenRows, screenX, screenY);
+    var candidateOdd = getCellFromOne(oddRows, screenX, screenY);
 
     if (candidateEven && !candidateOdd) {
       return candidateEven;
