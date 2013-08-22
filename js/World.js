@@ -75,7 +75,7 @@ function World(viewportWidth, viewportHeight) {
       for (var c in drawnMap[r]) {
         var coordinates = drawnMap[r][c];
         var cell = this.map.rows[r].cols[c];
-        cell.drawTopping(this.tilemap, context, coordinates.x, coordinates.y);
+        cell.drawHigher(this.tilemap, context, coordinates.x, coordinates.y);
       }
     }
   }
@@ -162,9 +162,15 @@ function Cell(baseTextureOrigin) {
   this.width = 64; 
   this.height = 32;
   this.toppingTexture;
+  this.heightItems;
 
   this.addTopping = function (toppingData) {
     this.toppingTexture = toppingData;
+  }
+
+  this.addHeightItem = function (hItem) {
+    this.heightItems = this.heightItems || [];
+    this.heightItems.push(hItem);
   }
 
   this.drawBase = function (tilemap, context, x, y) {
@@ -176,7 +182,23 @@ function Cell(baseTextureOrigin) {
       this.width, this.height);
   }
 
-  this.drawTopping = function (tilemap, context, x, y) {
+  this.drawHigher = function (tilemap, context, x, y) {
+    if (this.heightItems) {
+      //var drawX = x;
+      var drawY = y;
+      
+      for (var i in this.heightItems) {
+        var item = this.heightItems[i];
+        context.drawImage(
+          tilemap,
+          item.x, item.y,
+          this.width, this.height * 2,
+          x, drawY - this.height,
+          this.width, this.height * 2);
+        drawY -= this.height
+      }
+    }
+
     if (this.toppingTexture) {
       context.drawImage(
         tilemap,

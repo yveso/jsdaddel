@@ -18,6 +18,14 @@ var treeTopping = function () {
   return { x: 128, y: 786, width: 64, height: 108 };
 }
 
+var rockHeight = function () {
+  return { x: 256, y: 320 };
+}
+
+var rockTopping = function () {
+  return { x: 0, y: 320 };
+}
+
 var sampleMap = function () {
   var map = {};
   map.rows = [];
@@ -42,6 +50,42 @@ var sampleMap = function () {
   map.rows[3].cols[3].addTopping(grassTopping());
 
   map.rows[20].cols[1].addTopping(treeTopping());
+
+  map.rows[23].cols[6].addHeightItem(rockHeight());
+  map.rows[23].cols[6].addHeightItem(rockHeight());
+  map.rows[23].cols[6].addHeightItem(rockHeight());
+  map.rows[23].cols[6].addHeightItem(rockHeight());
+  map.rows[23].cols[6].addHeightItem(rockHeight());
+  map.rows[23].cols[6].addHeightItem(rockTopping());
+
+  map.rows[23].cols[7].addHeightItem(rockHeight());
+  map.rows[23].cols[7].addHeightItem(rockHeight());
+  map.rows[23].cols[7].addHeightItem(rockHeight());
+  map.rows[23].cols[7].addHeightItem(rockHeight());
+  map.rows[23].cols[7].addHeightItem(rockHeight());
+  map.rows[23].cols[7].addHeightItem(rockTopping());
+
+  map.rows[24].cols[7].addHeightItem(rockHeight());
+  map.rows[24].cols[7].addHeightItem(rockHeight());
+  map.rows[24].cols[7].addHeightItem(rockHeight());
+  map.rows[24].cols[7].addHeightItem(rockTopping());
+
+  map.rows[24].cols[8].addHeightItem(rockHeight());
+  map.rows[24].cols[8].addHeightItem(rockHeight());
+  map.rows[24].cols[8].addHeightItem(rockHeight());
+  map.rows[24].cols[8].addHeightItem(rockHeight());
+  map.rows[24].cols[8].addHeightItem(rockTopping());
+
+  map.rows[25].cols[6].addHeightItem(rockHeight());
+  map.rows[25].cols[6].addHeightItem(rockHeight());
+  map.rows[25].cols[6].addHeightItem(rockTopping());
+
+  map.rows[25].cols[7].addHeightItem(rockHeight());
+  map.rows[25].cols[7].addHeightItem(rockHeight());
+  map.rows[25].cols[7].addHeightItem(rockTopping());
+
+  map.rows[25].cols[8].addHeightItem(rockTopping());
+
 
   return map;
 }
