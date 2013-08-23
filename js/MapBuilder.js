@@ -2,7 +2,6 @@ var baseTileCutter = function (row, col) {
   var offsetY = 32;
   var width = 64;
   var height = 32;
-
   return { x: col * width, y: row * (height + offsetY) + offsetY };
 }
 
