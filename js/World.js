@@ -159,6 +159,7 @@ function Camera(width, height) {
 
 function Cell(baseTextureOrigin) {
   this.baseTextureOrigin = baseTextureOrigin;
+  this.baseTextureOriginEnhanced;
   this.width = 64; 
   this.height = 32;
   this.toppingTexture;
@@ -180,6 +181,14 @@ function Cell(baseTextureOrigin) {
       this.width, this.height,
       x, y,
       this.width, this.height);
+    if (this.baseTextureOriginEnhanced) {
+      context.drawImage(
+        tilemap,
+        this.baseTextureOriginEnhanced.x, this.baseTextureOriginEnhanced.y,
+        this.width, this.height,
+        x, y,
+        this.width, this.height);
+    }
   }
 
   this.drawHigher = function (tilemap, context, x, y) {

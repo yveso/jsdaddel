@@ -25,6 +25,22 @@ function MapBuilder () {
   this.rockTopping = function () {
     return { x: 0, y: 320 };
   }
+  
+  this.coast_leftBelow_rightBelow = function () {
+    return { x: 0, y: 544 };
+  }
+  
+  this.coast_leftBelow = function () {
+    return { x: 70, y: 544 };
+  }
+  
+  this.coast_below = function () {
+    return { x: 576, y: 608 };
+  }
+  
+  this.coast_right = function () {
+    return { x: 448, y: 608 };
+  }
 }
 
 var sampleMap = function () {
@@ -89,5 +105,27 @@ var sampleMap = function () {
   map.rows[25].cols[8].addHeightItem(mb.rockTopping());
 
 
+  return map;
+}
+
+var sampleMap2 = function () {
+  var mb = new MapBuilder();
+  var map = {};
+  map.rows = [];
+  
+  for (var r = 0; r < 50; r++) {
+    map.rows[r] = {};
+    map.rows[r].cols = [];
+    for (var c = 0; c < 40; c++) {
+      map.rows[r].cols.push(new Cell(mb.baseTileCutter(0, 1)));
+    }
+  }
+  
+  map.rows[2].cols[3].baseTextureOriginEnhanced = mb.coast_leftBelow();
+  map.rows[3].cols[4].baseTextureOriginEnhanced = mb.coast_below();
+  map.rows[3].cols[3].baseTextureOriginEnhanced = mb.coast_leftBelow();
+  map.rows[4].cols[4].baseTextureOriginEnhanced = mb.coast_leftBelow_rightBelow();
+  map.rows[4].cols[5].baseTextureOriginEnhanced = mb.coast_leftBelow_rightBelow();
+  
   return map;
 }
