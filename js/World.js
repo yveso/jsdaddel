@@ -1,7 +1,7 @@
-function World(viewportWidth, viewportHeight) {
+function World(camera) {
   this.tilemap = new Image();
   this.tilemap.src = "textures/iso-64x64-outside.png";
-  this.cam = new Camera(viewportWidth, viewportHeight)
+  this.cam = camera;
   this.map = sampleMap();
 
   var drawnMap = [];
@@ -23,11 +23,11 @@ function World(viewportWidth, viewportHeight) {
       this.cam.y -= scrollFactor;
       scrollingActive = true;
     }
-    if (pressedKeys[39] && this.cam.x + viewportWidth < (this.map.rows[1].cols.length + 0.5) * cellWidth) {//right
+    if (pressedKeys[39] && this.cam.x + this.cam.width < (this.map.rows[1].cols.length + 0.5) * cellWidth) {//right
       this.cam.x += scrollFactor;
       scrollingActive = true;
     }
-    if (pressedKeys[40] && this.cam.y + viewportHeight < this.map.rows.length * (cellHeight / 2) + (cellHeight / 2)) {//down
+    if (pressedKeys[40] && this.cam.y + this.cam.height < this.map.rows.length * (cellHeight / 2) + (cellHeight / 2)) {//down
       this.cam.y += scrollFactor;
       scrollingActive = true;
     }
@@ -44,8 +44,8 @@ function World(viewportWidth, viewportHeight) {
         var drawX = (c * cellWidth + horOffset) - this.cam.x;
         var drawY = (r * (cellHeight - verOffset)) - this.cam.y;
 
-        if (drawX > -cellWidth && drawX < viewportWidth
-            && drawY > -cellHeight && drawY < viewportHeight) {
+        if (drawX > -cellWidth && drawX < this.cam.width
+            && drawY > -cellHeight && drawY < this.cam.height) {
           drawnMap[r] = drawnMap[r] || [];
           drawnMap[r][c] = { x: drawX, y: drawY };
         }
