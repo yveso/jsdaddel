@@ -1,7 +1,7 @@
-function World(viewportWidth, viewportHeight) {
+function World(camera) {
   this.tilemap = new Image();
   this.tilemap.src = "textures/iso-64x64-outside.png";
-  this.cam = new Camera(viewportWidth, viewportHeight)
+  this.cam = camera;
   this.map = sampleMap();
 
   var drawnMap = [];
@@ -11,6 +11,12 @@ function World(viewportWidth, viewportHeight) {
 
   var mouseCell = {};
   var lastMouseX, lastMouseY;
+
+  var scrollbars = new Scrollbars(
+    document.getElementById("horScrollbar").getContext("2d"),
+    document.getElementById("verScrollbar").getContext("2d"),
+    (this.map.rows[0].cols.length + 0.5) * cellWidth,
+    this.map.rows.length * (cellHeight / 2) + (cellHeight / 2))
 
   this.update = function (mouseX, mouseY, pressedKeys) {
     var scrollFactor = 4;
@@ -23,11 +29,11 @@ function World(viewportWidth, viewportHeight) {
       this.cam.y -= scrollFactor;
       scrollingActive = true;
     }
-    if (pressedKeys[39] && this.cam.x + viewportWidth < (this.map.rows[1].cols.length + 0.5) * cellWidth) {//right
+    if (pressedKeys[39] && this.cam.x + this.cam.width < (this.map.rows[1].cols.length + 0.5) * cellWidth) {//right
       this.cam.x += scrollFactor;
       scrollingActive = true;
     }
-    if (pressedKeys[40] && this.cam.y + viewportHeight < this.map.rows.length * (cellHeight / 2) + (cellHeight / 2)) {//down
+    if (pressedKeys[40] && this.cam.y + this.cam.height < this.map.rows.length * (cellHeight / 2) + (cellHeight / 2)) {//down
       this.cam.y += scrollFactor;
       scrollingActive = true;
     }
@@ -44,8 +50,8 @@ function World(viewportWidth, viewportHeight) {
         var drawX = (c * cellWidth + horOffset) - this.cam.x;
         var drawY = (r * (cellHeight - verOffset)) - this.cam.y;
 
-        if (drawX > -cellWidth && drawX < viewportWidth
-            && drawY > -cellHeight && drawY < viewportHeight) {
+        if (drawX > -cellWidth && drawX < this.cam.width
+            && drawY > -cellHeight && drawY < this.cam.height) {
           drawnMap[r] = drawnMap[r] || [];
           drawnMap[r][c] = { x: drawX, y: drawY };
         }
@@ -58,6 +64,10 @@ function World(viewportWidth, viewportHeight) {
     }
     lastMouseX = mouseX;
     lastMouseY = mouseY;
+
+    if (scrollingActive) {
+      scrollbars.update(this.cam);
+    }
   }
 
   this.draw = function (context) {
@@ -70,7 +80,7 @@ function World(viewportWidth, viewportHeight) {
     }
 
     drawMouseCell(context);
-    
+
     for (var r in drawnMap) {
       for (var c in drawnMap[r]) {
         var coordinates = drawnMap[r][c];
@@ -78,6 +88,8 @@ function World(viewportWidth, viewportHeight) {
         cell.drawHigher(this.tilemap, context, coordinates.x, coordinates.y);
       }
     }
+
+    scrollbars.draw();
   }
 
   var nearerCell = function (cellOne, cellTwo, x, y) {
@@ -217,4 +229,31 @@ function Cell(baseTextureOrigin) {
         this.toppingTexture.width, this.toppingTexture.height);
     }
   } 
+}
+
+function Scrollbars(contextHor, contextVer, mapWidth, mapHeight) {
+  this.horBarWidth;
+  this.horPos;
+
+  this.verBarHeight;
+  this.verPos;
+
+  this.update = function (camera) {
+    var horRatio = camera.width / mapWidth;
+    this.horBarWidth = horRatio * contextHor.canvas.width;
+    this.horPos = (camera.x / mapWidth) * contextHor.canvas.width;
+
+    var verRatio = camera.height / mapHeight;
+    this.verBarHeight = verRatio * contextVer.canvas.height;
+    this.verPos = (camera.y / mapHeight) * contextVer.canvas.height;
+    //console.log(verRatio, this.verBarHeight, this.verPos)
+  };
+
+  this.draw = function () {
+    contextHor.canvas.width = contextHor.canvas.width;
+    contextHor.fillRect(this.horPos, 0, this.horBarWidth, contextHor.canvas.height);
+
+    contextVer.canvas.width = contextVer.canvas.width;
+    contextVer.fillRect(0, this.verPos, contextVer.canvas.width, this.verBarHeight);
+  }
 }
