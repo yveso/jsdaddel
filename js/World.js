@@ -16,7 +16,9 @@ function World(camera) {
     document.getElementById("horScrollbar").getContext("2d"),
     document.getElementById("verScrollbar").getContext("2d"),
     (this.map.rows[0].cols.length + 0.5) * cellWidth,
-    this.map.rows.length * (cellHeight / 2) + (cellHeight / 2))
+    this.map.rows.length * (cellHeight / 2) + (cellHeight / 2));
+
+  var firstRun = true; //to be replaced...
 
   this.update = function (mouseX, mouseY, pressedKeys) {
     var scrollFactor = 4;
@@ -67,6 +69,12 @@ function World(camera) {
 
     if (scrollingActive) {
       scrollbars.update(this.cam);
+    }
+
+    if (firstRun) {
+      scrollbars.update(this.cam);
+
+      firstRun = false;
     }
   }
 
@@ -205,7 +213,6 @@ function Cell(baseTextureOrigin) {
 
   this.drawHigher = function (tilemap, context, x, y) {
     if (this.heightItems) {
-      //var drawX = x;
       var drawY = y;
       
       for (var i in this.heightItems) {
@@ -246,7 +253,6 @@ function Scrollbars(contextHor, contextVer, mapWidth, mapHeight) {
     var verRatio = camera.height / mapHeight;
     this.verBarHeight = verRatio * contextVer.canvas.height;
     this.verPos = (camera.y / mapHeight) * contextVer.canvas.height;
-    //console.log(verRatio, this.verBarHeight, this.verPos)
   };
 
   this.draw = function () {
