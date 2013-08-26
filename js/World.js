@@ -12,6 +12,12 @@ function World(camera) {
   var mouseCell = {};
   var lastMouseX, lastMouseY;
 
+  var scrollbars = new Scrollbars(
+    document.getElementById("horScrollbar").getContext("2d"),
+    document.getElementById("verScrollbar").getContext("2d"),
+    (this.map.rows[0].cols.length + 0.5) * cellWidth,
+    this.map.rows.length * (cellHeight / 2) + (cellHeight / 2))
+
   this.update = function (mouseX, mouseY, pressedKeys) {
     var scrollFactor = 4;
     var scrollingActive = false;
@@ -58,6 +64,10 @@ function World(camera) {
     }
     lastMouseX = mouseX;
     lastMouseY = mouseY;
+
+    if (scrollingActive) {
+      scrollbars.update(this.cam);
+    }
   }
 
   this.draw = function (context) {
@@ -70,7 +80,7 @@ function World(camera) {
     }
 
     drawMouseCell(context);
-    
+
     for (var r in drawnMap) {
       for (var c in drawnMap[r]) {
         var coordinates = drawnMap[r][c];
@@ -78,6 +88,8 @@ function World(camera) {
         cell.drawHigher(this.tilemap, context, coordinates.x, coordinates.y);
       }
     }
+
+    scrollbars.draw();
   }
 
   var nearerCell = function (cellOne, cellTwo, x, y) {
@@ -217,4 +229,31 @@ function Cell(baseTextureOrigin) {
         this.toppingTexture.width, this.toppingTexture.height);
     }
   } 
+}
+
+function Scrollbars(contextHor, contextVer, mapWidth, mapHeight) {
+  this.horBarWidth;
+  this.horPos;
+
+  this.verBarHeight;
+  this.verPos;
+
+  this.update = function (camera) {
+    var horRatio = camera.width / mapWidth;
+    this.horBarWidth = horRatio * contextHor.canvas.width;
+    this.horPos = (camera.x / mapWidth) * contextHor.canvas.width;
+
+    var verRatio = camera.height / mapHeight;
+    this.verBarHeight = verRatio * contextVer.canvas.height;
+    this.verPos = (camera.y / mapHeight) * contextVer.canvas.height;
+    //console.log(verRatio, this.verBarHeight, this.verPos)
+  };
+
+  this.draw = function () {
+    contextHor.canvas.width = contextHor.canvas.width;
+    contextHor.fillRect(this.horPos, 0, this.horBarWidth, contextHor.canvas.height);
+
+    contextVer.canvas.width = contextVer.canvas.width;
+    contextVer.fillRect(0, this.verPos, contextVer.canvas.width, this.verBarHeight);
+  }
 }
