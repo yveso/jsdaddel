@@ -114,16 +114,19 @@ function AStar(map) {
 
           var costs_g = current.g_value + currNb.cost;
           var costs_h = heuristic(currNb, to);
-
-          var indexInOpenList = indexOf(openList, currNb);
-          if (indexInOpenList !== -1
-              && openList[indexInOpenList].g_value <= costs_g) {
-            continue;
-          }
           var path = current.path.slice(0);
           path.push({ x: currNb.x, y: currNb.y })
 
-          openList.push({ x: currNb.x, y: currNb.y, g_value: costs_g, h_value: costs_h, path: path });
+          var indexInOpenList = indexOf(openList, currNb);
+          if (indexInOpenList !== -1) {
+            if (openList[indexInOpenList].g_value <= costs_g) {
+              continue;
+            } else {
+              openList[indexInOpenList] = { x: currNb.x, y: currNb.y, g_value: costs_g, h_value: costs_h, path: path };
+            }
+          } else {
+            openList.push({ x: currNb.x, y: currNb.y, g_value: costs_g, h_value: costs_h, path: path });
+          }
         }
       }
     }
@@ -147,7 +150,7 @@ function AStar(map) {
   }
 
   var heuristic = function (from, to) {
-    return Math.sqrt(Math.pow(from.x - to.x, 2) + Math.pow(from.y - to.y, 2)) * 100;
+    return Math.sqrt(Math.pow(from.x - to.x, 2) + Math.pow(from.y - to.y, 2)) * 40;
   }
 }
 
