@@ -1,7 +1,7 @@
 function Level() {
   this.map = Map.sampleMap();
   this.hero = new MoveableObject(1, 1);
-  this.aStar = new AStar(this.map.map); 
+  this.aStar = new AStar(this.map); 
 }
 
 Level.prototype.update = function (mouseX, mouseY, hasClicked) {
@@ -59,6 +59,18 @@ Map.prototype.draw = function (context) {
   }
 }
 
+Map.prototype.isCoordinateInBounds = function (x, y) {
+  return this.map.rows !== undefined
+    && this.map.rows[y] !== undefined
+    && this.map.rows[y].cols !== undefined
+    && this.map.rows[y].cols[x] !== undefined;
+}
+
+Map.prototype.isCoordinateWalkable = function (x, y) {
+  return this.isCoordinateInBounds(x, y)
+    && this.map.rows[y].cols[x] !== 0;
+}
+
 Map.sampleMap = function () {
   var map = new Map(800, 600);
   map.setWalkableFactor(50, 30, 123, 67, 0);
@@ -75,6 +87,10 @@ function AStar(map) {
   this.map = map;
 
   this.findPath = function (from, to) {
+    if (!this.map.isCoordinateWalkable(to.x, to.y)) {
+      return [];
+    }
+
     var closedList = [];
     var openList = [];
     openList.push({ x: from.x, y: from.y, g_value: 0, h_value: 0, path: [] });
@@ -105,11 +121,7 @@ function AStar(map) {
       for (var i = 0; i < possibleNeighbours.length; i++) {
         var currNb = possibleNeighbours[i];
 
-        if (this.map.rows
-            && this.map.rows[currNb.y]
-            && this.map.rows[currNb.y].cols
-            && this.map.rows[currNb.y].cols[currNb.x] !== undefined
-            && this.map.rows[currNb.y].cols[currNb.x] !== 0
+        if (this.map.isCoordinateWalkable(currNb.x, currNb.y)
             && !contains(closedList, currNb)) {
 
           var costs_g = current.g_value + currNb.cost;
