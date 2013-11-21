@@ -1,7 +1,9 @@
 function Game(canvas) {
   this.fps = 60;
-  var level = new Level();
+  this.level = new Level();
   this.canvas = canvas;
+
+  var instance = this;
   var context = canvas.getContext("2d");
   var mouseX, mouseY;
   var hasClicked = false;
@@ -32,21 +34,12 @@ function Game(canvas) {
   }
 
   var step = function () {
-    level.update(mouseX, mouseY, hasClicked);
+    instance.level.update(mouseX, mouseY, hasClicked);
     hasClicked = false;
-    level.draw(context);
+    instance.level.draw(context);
   }
 
   this.stop = function () {
     window.clearInterval(requestID);
   }
 }
-
-
-//Game.prototype.update = function () {
-//  this.level.update();
-//}
-//
-//Game.prototype.draw = function (context) {
-//  this.level.draw(context);
-//}
